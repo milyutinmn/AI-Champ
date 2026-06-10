@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Champions Community - Запускаем сеть внутренних AI-champions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #eff6ff;
+            --accent: #2563eb;
+            --text-dark: #0f172a;
+            --text-mid: #334155;
+            --text-light: #64748b;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --border: #e2e8f0;
+            --red: #ef4444;
+            --green: #10b981;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow 0.3s;
+        }
+
+        .nav.scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600 !important;
+        }
+
+        .nav-cta:hover { background: var(--primary-dark); color: white !important; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%);
+            color: white;
+            padding: 160px 0 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="g" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,0.08)"/></pattern></defs><rect width="60" height="60" fill="url(%23g)"/></svg>');
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.25rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+            border-color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.35);
+        }
+
+        /* ── SECTION BASE ── */
+        .section { padding: 88px 0; }
+        .section-alt { background: var(--bg-light); }
+
+        .section-label {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+            color: var(--text-dark);
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            text-align: center;
+            max-width: 660px;
+            margin: 0 auto 3.5rem;
+            line-height: 1.7;
+        }
+
+        /* ── PROBLEM ── */
+        .problem-list {
+            list-style: none;
+            max-width: 780px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .problem-item {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 14px;
+            border-left: 4px solid var(--red);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            transition: transform 0.2s;
+        }
+
+        .problem-item:hover { transform: translateX(4px); }
+
+        .problem-icon {
+            font-size: 1.75rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .problem-item h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .problem-item p { color: var(--text-mid); font-size: 0.95rem; }
+
+        /* ── SOLUTION ── */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .solution-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border);
+        }
+
+        .solution-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(37,99,235,0.12);
+        }
+
+        .solution-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--primary-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
+        }
+
+        .solution-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .solution-card p { color: var(--text-mid); font-size: 0.95rem; }
+
+        .flow-bar {
+            background: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            text-align: center;
+        }
+
+        .flow-bar h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+
+        .flow-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .flow-arrow { color: var(--primary); font-size: 1.25rem; }
+        .flow-last { color: var(--primary); }
+
+        /* ── TIMELINE (horizontal stepper on desktop) ── */
+        .stepper {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            position: relative;
+            margin-top: 3rem;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: calc(12.5%);
+            right: calc(12.5%);
+            height: 2px;
+            background: #bfdbfe;
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .step-number {
+            width: 56px;
+            height: 56px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .step-body {
+            margin-top: 1.25rem;
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+            text-align: left;
+            width: 100%;
+        }
+
+        .step-body h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: var(--text-dark);
+        }
+
+        .step-body p { font-size: 0.88rem; color: var(--text-mid); line-height: 1.6; }
+
+        @media (max-width: 900px) {
+            .stepper {
+                grid-template-columns: 1fr;
+            }
+
+            .stepper::before { display: none; }
+
+            .step {
+                flex-direction: row;
+                align-items: flex-start;
+                text-align: left;
+                padding: 0;
+                margin-bottom: 1.25rem;
+            }
+
+            .step-number { flex-shrink: 0; }
+
+            .step-body {
+                margin-top: 0;
+                margin-left: 1.25rem;
+            }
+        }
+
+        /* ── BENEFITS ── */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            border-top: 3px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--primary);
+        }
+
+        .benefit-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: var(--primary);
+        }
+
+        .benefit-card p { font-size: 0.95rem; color: var(--text-mid); }
+
+        /* ── AUDIENCE ── */
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .audience-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .audience-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .audience-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text-dark);
+        }
+
+        .audience-card p { font-size: 0.95rem; color: var(--text-mid); }
+
+        /* ── FORMAT ── */
+        .format-card {
+            max-width: 680px;
+            margin: 3rem auto 0;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px rgba(37,99,235,0.1);
+        }
+
+        .format-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .format-list { grid-template-columns: 1fr; }
+        }
+
+        .format-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.97rem;
+            color: var(--text-mid);
+            line-height: 1.5;
+        }
+
+        .format-list li::before {
+            content: '✓';
+            color: var(--primary);
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* ── CASES ── */
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .case-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .case-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            color: var(--text-dark);
+        }
+
+        .case-card p { font-size: 0.95rem; color: var(--text-mid); flex: 1; }
+
+        .case-metric {
+            margin-top: 1rem;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #059669;
+        }
+
+        /* ── SOCIAL PROOF ── */
+        .proof-section {
+            background: var(--primary);
+            padding: 56px 0;
+        }
+
+        .proof-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .proof-stat {
+            text-align: center;
+            color: white;
+        }
+
+        .proof-stat .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .proof-stat .label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .proof-divider {
+            width: 1px;
+            height: 60px;
+            background: rgba(255,255,255,0.25);
+        }
+
+        @media (max-width: 600px) {
+            .proof-divider { display: none; }
+        }
+
+        .quotes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .quote-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .quote-card::before {
+            content: '"';
+            position: absolute;
+            top: 0.5rem;
+            left: 1.25rem;
+            font-size: 4rem;
+            color: #bfdbfe;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .quote-text {
+            font-size: 0.97rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+            margin-top: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .quote-author {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .quote-role {
+            font-size: 0.82rem;
+            color: var(--text-light);
+        }
+
+        /* ── ABOUT ── */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .about-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .about-card-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--primary-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem;
+        }
+
+        .about-card h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .about-card p { font-size: 0.95rem; color: var(--text-mid); }
+
+        /* ── CTA SECTION ── */
+        .cta-section {
+            background: var(--bg-light);
+            padding: 88px 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section > .container > p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        /* ── FORM ── */
+        .form-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .yandex-form-embed {
+            width: 100%;
+            min-height: 420px;
+            border: none;
+            display: block;
+        }
+
+        .form-fallback {
+            text-align: center;
+            padding: 1rem 0 0.5rem;
+        }
+
+        .form-fallback p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .form-fallback-note {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 1rem;
+        }
+
+        .btn-form-link {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn-form-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            color: white;
+        }
+
+        .form-footer {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.82rem;
+            color: var(--text-light);
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .form-footer a:hover { text-decoration: underline; }
+
+        .form-footer-sep { margin: 0 0.35rem; }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: var(--text-dark);
+            color: rgba(255,255,255,0.55);
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.88rem;
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-up { animation: fadeInUp 0.5s ease-out both; }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="nav" id="mainNav">
+        <div class="container">
+            <div class="nav-inner">
+                <a href="#" class="nav-logo">AI Champions Community</a>
+                <ul class="nav-links">
+                    <li><a href="#problem">Проблема</a></li>
+                    <li><a href="#how">Как работает</a></li>
+                    <li><a href="#format">Формат</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#contact" class="nav-cta">Обсудить пилот</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">Корпоративная программа</span>
+                <h1>Запускаем сеть внутренних AI‑champions,<br>которые двигают ИИ в вашей компании</h1>
+                <p class="hero-subtitle">Ежемесячные вебинары, практикумы и комьюнити ранних последователей, которые превращают ИИ из хайпа в измеримый бизнес‑результат.</p>
+                <div class="cta-buttons">
+                    <a href="#contact" class="btn btn-white">Обсудить пилот</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- PROBLEM -->
+    <section class="section section-alt" id="problem">
+        <div class="container">
+            <span class="section-label">Боль рынка</span>
+            <h2 class="section-title">Проблема для корпораций</h2>
+            <ul class="problem-list">
+                <li class="problem-item">
+                    <div class="problem-icon">⚡</div>
+                    <div>
+                        <h3>Эпизодическое использование</h3>
+                        <p>Большинство сотрудников пробовали ИИ, но используют его эпизодически, без системных сценариев.</p>
+                    </div>
+                </li>
+                <li class="problem-item">
+                    <div class="problem-icon">📊</div>
+                    <div>
+                        <h3>Сложность масштабирования</h3>
+                        <p>Руководству сложно масштабировать удачные кейсы по всей компании.</p>
+                    </div>
+                </li>
+                <li class="problem-item">
+                    <div class="problem-icon">🔗</div>
+                    <div>
+                        <h3>Отсутствие сообщества</h3>
+                        <p>Нет сообщества людей, которые тянут ИИ вперёд, делятся сценариями и поддерживают остальных.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- SOLUTION -->
+    <section class="section">
+        <div class="container">
+            <span class="section-label">Решение</span>
+            <h2 class="section-title">AI Champions Community</h2>
+            <p class="section-subtitle">Мы запускаем внутри вашей организации закрытое сообщество ранних последователей ИИ — людей, которые готовы пробовать новое, делиться опытом и помогать другим.</p>
+
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <div class="solution-icon">📅</div>
+                    <h3>Регулярность</h3>
+                    <p>Ежемесячный ритм вебинаров и практикумов для постоянного развития</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">🎯</div>
+                    <h3>Практическая ориентированность</h3>
+                    <p>Разбор реальных кейсов, а не только теория. Фокус на ваших задачах</p>
+                </div>
+                <div class="solution-card">
+                    <div class="solution-icon">🤝</div>
+                    <h3>Поддерживающее сообщество</h3>
+                    <p>Обмен опытом, шаблонами и результатами в закрытом комьюнити</p>
+                </div>
+            </div>
+
+            <div class="flow-bar">
+                <h3>Схема работы</h3>
+                <div class="flow-steps">
+                    <span>Комьюнити</span>
+                    <span class="flow-arrow">→</span>
+                    <span>Чемпионы</span>
+                    <span class="flow-arrow">→</span>
+                    <span>Команды</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-last">Бизнес‑эффект</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section section-alt" id="how">
+        <div class="container">
+            <span class="section-label">Процесс</span>
+            <h2 class="section-title">Как это работает</h2>
+            <p class="section-subtitle">Четыре регулярных элемента, которые повторяются каждый месяц</p>
+
+            <div class="stepper">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-body">
+                        <h3>Диагностика и отбор участников</h3>
+                        <p>Сессия с ключевыми стейкхолдерами, уточнение целей, выбор пилотных направлений. Помогаем отобрать 20–100 мотивированных early adopters из разных функций.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-body">
+                        <h3>Вебинар об обновлениях и трендах</h3>
+                        <p>Обзор ключевых обновлений в ИИ и релевантных бизнес‑кейсов в вашей отрасли. Новые инструменты и их практическое применение.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-body">
+                        <h3>Практикум по задачам участников</h3>
+                        <p>Воркшоп по реальным задачам: от построения промптов до дизайн‑сессий по конкретным процессам с измеримыми результатами.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-body">
+                        <h3>Поддержка + тиражирование кейсов</h3>
+                        <p>Онлайн‑комьюнити для обмена сценариями. Лучшие кейсы оформляем в плейбуки и обучающие материалы для масштабирования.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BENEFITS -->
+    <section class="section">
+        <div class="container">
+            <span class="section-label">Результат</span>
+            <h2 class="section-title">Что получают компании</h2>
+            <p class="section-subtitle">Уже через 3–6 месяцев вы видите измеримые результаты</p>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3>Конкретные сценарии применения</h3>
+                    <p>Карточки реальных кейсов применения ИИ в ключевых функциях: маркетинг, продажи, HR, финансы, операции.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Измеримая экономия</h3>
+                    <p>Экономия времени и ресурсов за счёт автоматизации типовых задач и улучшения качества решений.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Сеть внутренних ИИ‑лидеров</h3>
+                    <p>Пул AI‑champions, которые умеют работать с ИИ‑инструментами в своих процессах и обучают коллег.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Рост цифровой грамотности</h3>
+                    <p>Устойчивая культура экспериментов и обмена знаниями, а не разовый всплеск после «модного» тренинга.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUDIENCE -->
+    <section class="section section-alt">
+        <div class="container">
+            <span class="section-label">Целевая аудитория</span>
+            <h2 class="section-title">Для кого программа</h2>
+            <div class="audience-grid">
+                <div class="audience-card">
+                    <div class="audience-icon">🎓</div>
+                    <div>
+                        <h3>HR и L&D‑команды</h3>
+                        <p>Которые отвечают за развитие компетенций будущего и хотят встроить ИИ в корпоративное обучение</p>
+                    </div>
+                </div>
+                <div class="audience-card">
+                    <div class="audience-icon">💻</div>
+                    <div>
+                        <h3>CIO / CDTO и лидеры цифровой трансформации</h3>
+                        <p>Которым важно, чтобы ИИ‑инструменты реально использовались сотрудниками</p>
+                    </div>
+                </div>
+                <div class="audience-card">
+                    <div class="audience-icon">📈</div>
+                    <div>
+                        <h3>Руководители направлений</h3>
+                        <p>Которые видят потенциал ИИ в своих процессах и хотят двигаться быстрее конкурентов</p>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 2rem; font-size: 1rem; color: var(--text-light);">
+                Оптимально для компаний от <strong style="color: var(--text-dark);">500+ сотрудников</strong>, которые уже пробуют ИИ, но хотят перейти от хаотичных экспериментов к системному подходу.
+            </p>
+        </div>
+    </section>
+
+    <!-- FORMAT -->
+    <section class="section" id="format">
+        <div class="container">
+            <span class="section-label">Формат работы</span>
+            <h2 class="section-title">Что входит в программу</h2>
+            <p class="section-subtitle">Программа проектируется под стратегические задачи вашей компании</p>
+            <div class="format-card">
+                <ul class="format-list">
+                    <li>1× вебинар + 1× практикум в месяц</li>
+                    <li>Доступ участников к библиотеке материалов</li>
+                    <li>Онлайн‑комьюнити для обмена сценариями и шаблонами</li>
+                    <li>Воркшопы под отдельные функции (HR, маркетинг, продажи и др.)</li>
+                    <li>Консультации по отбору и запуску внутренних AI‑проектов</li>
+                    <li>Приоритетная поддержка кураторов</li>
+                    <li>Совместный дизайн программы под ваши стратегические инициативы</li>
+                    <li>Отчёты для руководства по вовлечённости, кейсам и эффекту</li>
+                    <li>Поддержка внутренних обучающих потоков</li>
+                    <li>Кастомизация под ваши процессы и KPI</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CASES -->
+    <section class="section section-alt">
+        <div class="container">
+            <span class="section-label">Примеры</span>
+            <h2 class="section-title">Темы и кейсы</h2>
+            <div class="cases-grid">
+                <div class="case-card">
+                    <h3>ИИ‑агенты и copilots</h3>
+                    <p>Что реально работает в корпоративной среде. Практические примеры внедрения и измеримые результаты.</p>
+                </div>
+                <div class="case-card">
+                    <h3>ИИ в HR</h3>
+                    <p>Адаптация, обучение, оценка. Автоматизация рутинных процессов и повышение качества решений.</p>
+                    <div class="case-metric">Экономия: до 40% времени на обработке резюме</div>
+                </div>
+                <div class="case-card">
+                    <h3>ИИ в маркетинге и продажах</h3>
+                    <p>Персонализация коммуникаций, генерация контента, анализ данных клиентов.</p>
+                    <div class="case-metric">Рост конверсии: +25% за счёт персонализации</div>
+                </div>
+                <div class="case-card">
+                    <h3>RAG и внутренние ассистенты</h3>
+                    <p>Ассистенты на базе ваших документов для быстрого доступа к корпоративным знаниям.</p>
+                    <div class="case-metric">Поиск информации: с 15 до 2 минут</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOCIAL PROOF / QUOTES -->
+    <section class="section" id="proof">
+        <div class="container">
+            <span class="section-label">Отзывы</span>
+            <h2 class="section-title">Что говорят участники</h2>
+            <div class="quotes-grid">
+                <div class="quote-card">
+                    <p class="quote-text">Программа дала нам не просто знания, а живое сообщество людей, которые реально применяют ИИ в работе. Через три месяца у нас появились первые внутренние плейбуки.</p>
+                    <div class="quote-author">Анна К.</div>
+                    <div class="quote-role">Head of L&D, крупная розничная сеть</div>
+                </div>
+                <div class="quote-card">
+                    <p class="quote-text">Наконец‑то структурированный подход к ИИ‑трансформации. Не разовый тренинг, а системная работа с измеримым результатом на каждом этапе.</p>
+                    <div class="quote-author">Дмитрий В.</div>
+                    <div class="quote-role">CDTO, производственный холдинг</div>
+                </div>
+                <div class="quote-card">
+                    <p class="quote-text">Вебинары и практикумы удачно сочетаются: сначала понимаем тренды, потом сразу пробуем на реальных задачах. Команда вовлеклась гораздо быстрее, чем я ожидал.</p>
+                    <div class="quote-author">Михаил Р.</div>
+                    <div class="quote-role">Директор по операциям, финтех</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section section-alt" id="about">
+        <div class="container">
+            <span class="section-label">О нас</span>
+            <h2 class="section-title">Почему нам доверяют</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="about-card-icon">🏆</div>
+                    <h3>13 лет</h3>
+                    <p>опыта в проектировании корпоративных обучающих программ и e‑learning</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-card-icon">🚀</div>
+                    <h3>Практика</h3>
+                    <p>пилотирования и внедрения ИИ‑решений в реальных бизнес‑процессах</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-card-icon">📏</div>
+                    <h3>Результаты</h3>
+                    <p>Фокус на измеримых эффектах: вместе с командой выстраиваем устойчивую систему использования ИИ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="contact">
+        <div class="container">
+            <span class="section-label">Следующий шаг</span>
+            <h2>Обсудим вашу ситуацию?</h2>
+            <p>Оставьте заявку — в ходе 30‑минутного звонка мы разберём текущую ситуацию, предложим формат пилота и составим дорожную карту запуска.</p>
+            <div class="form-container">
+                <div id="formEmbed">
+                    <script src="https://forms.yandex.ru/_static/embed.js"></script>
+                    <iframe
+                        class="yandex-form-embed"
+                        src="https://forms.yandex.ru/u/6a29703d505690001dd117cc/?iframe=1"
+                        frameborder="0"
+                        name="ya-form-6a29703d505690001dd117cc"
+                        title="Форма заявки"
+                    ></iframe>
+                </div>
+                <div id="formFallback" class="form-fallback" hidden>
+                    <p>При открытии лэндинга с диска встроенная форма недоступна — так устроена защита Яндекса. Нажмите кнопку ниже или дождитесь публикации сайта на сервере.</p>
+                    <a
+                        class="btn-form-link"
+                        href="https://forms.yandex.ru/u/6a29703d505690001dd117cc/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Оставить заявку</a>
+                    <p class="form-fallback-note">После публикации на https-сайте форма появится прямо на этой странице.</p>
+                </div>
+                <p class="form-footer">
+                    Отправляя заявку, вы соглашаетесь с
+                    <a href="privacy.html">политикой обработки персональных данных</a>.<span class="form-footer-sep">·</span><a
+                        href="https://forms.yandex.ru/u/6a29703d505690001dd117cc/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >Открыть форму в новой вкладке</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            © 2025 AI Champions Community. Все права защищены.
+        </div>
+    </footer>
+
+    <script>
+        // Nav scroll shadow
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // Smooth scroll (offset for fixed nav)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    const offset = 72;
+                    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Yandex Form: iframe не работает при file:// — показываем ссылку
+        const formEmbed = document.getElementById('formEmbed');
+        const formFallback = document.getElementById('formFallback');
+        if (location.protocol === 'file:') {
+            formEmbed.hidden = true;
+            formFallback.hidden = false;
+        }
+
+        // Scroll animations
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('fade-in-up');
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll(
+            '.problem-item, .solution-card, .step, .benefit-card, .audience-card, .format-card, .case-card, .quote-card, .about-card'
+        ).forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
