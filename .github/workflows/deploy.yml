@@ -22,9 +22,14 @@ jobs:
             set -euo pipefail
             DIR="${{ secrets.VPS_APP_DIR }}"
             if [ ! -d "$DIR" ]; then
-              mkdir -p "$DIR" 2>/dev/null || sudo mkdir -p "$DIR"
+              echo "ERROR: $DIR not found. On server run once:"
+              echo "  sudo mkdir -p $DIR && sudo chown \$USER:\$USER $DIR"
+              exit 1
             fi
-            sudo chown -R "$USER:$USER" "$DIR"
+            if [ ! -w "$DIR" ]; then
+              echo "ERROR: $DIR is not writable by $USER"
+              exit 1
+            fi
 
       - name: Copy static files to server
         uses: appleboy/scp-action@v0.1.7
