@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Champions Community - Запускаем сеть внутренних AI-champions</title>
+    <link rel="preconnect" href="https://forms.yandex.ru">
+    <link rel="dns-prefetch" href="https://forms.yandex.ru">
     <style>
         * {
             margin: 0;
@@ -730,11 +732,42 @@
             text-align: left;
         }
 
+        .form-embed-wrap {
+            position: relative;
+            min-height: 720px;
+        }
+
+        .form-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            border-radius: 12px;
+            z-index: 1;
+            transition: opacity 0.25s;
+        }
+
+        .form-loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .yandex-form-embed {
             width: 100%;
-            min-height: 420px;
+            min-height: 720px;
+            height: 720px;
             border: none;
             display: block;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+
+        .yandex-form-embed.loaded {
+            opacity: 1;
         }
 
         .form-fallback {
@@ -1123,7 +1156,8 @@
             <h2>Обсудим вашу ситуацию?</h2>
             <p>Оставьте заявку — в ходе 30‑минутного звонка мы разберём текущую ситуацию, предложим формат пилота и составим дорожную карту запуска.</p>
             <div class="form-container">
-                <div id="formEmbed">
+                <div id="formEmbed" class="form-embed-wrap">
+                    <div class="form-loading" id="formLoading">Загрузка формы…</div>
                     <script src="https://forms.yandex.ru/_static/embed.js"></script>
                     <iframe
                         class="yandex-form-embed"
@@ -1131,6 +1165,7 @@
                         frameborder="0"
                         name="ya-form-6a297d6bd0468814b8938d4b"
                         title="Форма заявки"
+                        loading="eager"
                     ></iframe>
                 </div>
                 <div id="formFallback" class="form-fallback" hidden>
@@ -1185,9 +1220,41 @@
         // Yandex Form: iframe не работает при file:// — показываем ссылку
         const formEmbed = document.getElementById('formEmbed');
         const formFallback = document.getElementById('formFallback');
+        const formLoading = document.getElementById('formLoading');
+        const yaFrame = document.querySelector('.yandex-form-embed');
+
         if (location.protocol === 'file:') {
             formEmbed.hidden = true;
             formFallback.hidden = false;
+        } else if (yaFrame) {
+            const showForm = () => {
+                yaFrame.classList.add('loaded');
+                if (formLoading) formLoading.classList.add('hidden');
+            };
+
+            const resizeFrame = (height) => {
+                const nextHeight = Math.max(720, Number(height) || 0);
+                yaFrame.style.height = `${nextHeight}px`;
+                yaFrame.style.minHeight = `${nextHeight}px`;
+                if (formEmbed) formEmbed.style.minHeight = `${nextHeight}px`;
+            };
+
+            yaFrame.addEventListener('load', () => {
+                showForm();
+                resizeFrame(yaFrame.getBoundingClientRect().height);
+            });
+
+            window.addEventListener('message', (event) => {
+                if (!event.origin.includes('forms.yandex.ru')) return;
+                const data = event.data;
+                if (typeof data === 'object' && data && data.height) {
+                    resizeFrame(data.height);
+                    showForm();
+                }
+            });
+
+            // embed.js иногда срабатывает с задержкой — подстраховка
+            setTimeout(() => resizeFrame(yaFrame.getBoundingClientRect().height || 720), 1500);
         }
 
         // Scroll animations
