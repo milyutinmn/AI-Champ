@@ -51,3 +51,33 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT }}
           script: |
             chmod 644 ${{ secrets.VPS_APP_DIR }}/index.html ${{ secrets.VPS_APP_DIR }}/privacy.html
+
+      - name: Copy nginx config to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          source: "deploy/nginx-aichamp.conf"
+          target: "/tmp"
+          strip_components: 1
+          overwrite: true
+
+      - name: Configure nginx and SSL
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          script: |
+            set -euo pipefail
+            DOMAIN="aichamp.levellab.ru"
+            sudo mv /tmp/nginx-aichamp.conf "/etc/nginx/sites-available/${DOMAIN}"
+            sudo ln -sf "/etc/nginx/sites-available/${DOMAIN}" "/etc/nginx/sites-enabled/${DOMAIN}"
+            sudo nginx -t
+            sudo systemctl reload nginx
+            if ! sudo certbot certificates 2>/dev/null | grep -q "${DOMAIN}"; then
+              sudo certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos -m milyutin.mn@gmail.com --redirect
+            fi
