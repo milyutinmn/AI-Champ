@@ -3,6 +3,7 @@ name: Deploy landing to VPS
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,7 +19,12 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_SSH_PORT }}
           script: |
-            mkdir -p ${{ secrets.VPS_AICHAMP_DIR }}
+            set -euo pipefail
+            DIR="${{ secrets.VPS_AICHAMP_DIR }}"
+            if [ ! -d "$DIR" ]; then
+              mkdir -p "$DIR" 2>/dev/null || sudo mkdir -p "$DIR"
+            fi
+            sudo chown -R "$USER:$USER" "$DIR"
 
       - name: Copy static files to server
         uses: appleboy/scp-action@v0.1.7
@@ -29,6 +35,7 @@ jobs:
           port: ${{ secrets.VPS_SSH_PORT }}
           source: "index.html,privacy.html"
           target: ${{ secrets.VPS_AICHAMP_DIR }}
+          overwrite: true
 
       - name: Fix permissions
         uses: appleboy/ssh-action@v1.2.0
