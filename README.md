@@ -10,47 +10,27 @@
 |---|---|---|
 | Домен | `metodist.pro` | `aichamp.levellab.ru` |
 | Стек | Next.js + Docker (`:3000`) | Статические HTML |
-| Папка на VPS | `VPS_APP_DIR` (metodist) | `/var/www/aichamp.levellab.ru` |
-| Деплой | `Master_1104/platform` workflow | этот репозиторий, workflow ниже |
-
-Проекты не пересекаются: разные домены, разные папки, разные GitHub Actions.
-
-## Однократная настройка сервера
-
-На VPS (тот же, куда смотрит A-запись `aichamp.levellab.ru`):
-
-```bash
-sudo mkdir -p /var/www/aichamp.levellab.ru
-sudo chown $USER:$USER /var/www/aichamp.levellab.ru
-```
-
-Скопируйте конфиг nginx (пример в `deploy/nginx-aichamp.conf`):
-
-```bash
-sudo cp deploy/nginx-aichamp.conf /etc/nginx/sites-available/aichamp.levellab.ru
-sudo ln -s /etc/nginx/sites-available/aichamp.levellab.ru /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d aichamp.levellab.ru
-```
+| Папка на VPS | `VPS_APP_DIR` (metodist) | `/opt/ai_champ` |
+| Деплой | `metodist-pro` workflow | этот репозиторий |
 
 ## Секреты в GitHub (Settings → Secrets → Actions)
 
-Можно использовать те же `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT`, что и у metodist.
-
-Добавьте один новый секрет:
+Те же `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT`, что у metodist.
 
 | Секрет | Значение |
 |--------|----------|
-| `VPS_AICHAMP_DIR` | `/var/www/aichamp.levellab.ru` |
+| `VPS_APP_DIR` | `/opt/ai_champ` |
+
+## Однократная настройка сервера
+
+```bash
+sudo mkdir -p /opt/ai_champ
+sudo chown $USER:$USER /opt/ai_champ
+cd AI-Champ && bash deploy/setup-server.sh
+```
+
+Скрипт настроит nginx и SSL для `aichamp.levellab.ru`.
 
 ## Деплой
 
-1. Закоммитьте и запушьте в `main`
-2. GitHub Actions скопирует `index.html` и `privacy.html` на сервер
-3. Сайт обновится без перезапуска Docker metodist
-
-## DNS
-
-A-запись `aichamp.levellab.ru` → IP VPS (уже настроено).
-
-GitHub Pages **не нужен** при такой схеме — домен смотрит на VPS, не на GitHub.
+Push в `main` → GitHub Actions копирует файлы в `/opt/ai_champ`.

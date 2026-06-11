@@ -3,7 +3,7 @@
 set -euo pipefail
 
 DOMAIN="aichamp.levellab.ru"
-WEB_ROOT="/var/www/${DOMAIN}"
+WEB_ROOT="/opt/ai_champ"
 NGINX_AVAILABLE="/etc/nginx/sites-available/${DOMAIN}"
 NGINX_ENABLED="/etc/nginx/sites-enabled/${DOMAIN}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
