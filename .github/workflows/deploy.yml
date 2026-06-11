@@ -71,13 +71,23 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_SSH_PORT }}
+          command_timeout: 10m
           script: |
             set -euo pipefail
             DOMAIN="aichamp.levellab.ru"
-            sudo mv /tmp/nginx-aichamp.conf "/etc/nginx/sites-available/${DOMAIN}"
+            NGINX_TMP=""
+            for f in /tmp/nginx-aichamp.conf /tmp/deploy/nginx-aichamp.conf; do
+              if [ -f "$f" ]; then NGINX_TMP="$f"; break; fi
+            done
+            if [ -z "$NGINX_TMP" ]; then
+              echo "nginx config not found in /tmp"
+              ls -la /tmp
+              exit 1
+            fi
+            sudo cp "$NGINX_TMP" "/etc/nginx/sites-available/${DOMAIN}"
             sudo ln -sf "/etc/nginx/sites-available/${DOMAIN}" "/etc/nginx/sites-enabled/${DOMAIN}"
             sudo nginx -t
             sudo systemctl reload nginx
             if ! sudo certbot certificates 2>/dev/null | grep -q "${DOMAIN}"; then
-              sudo certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos -m milyutin.mn@gmail.com --redirect
+              sudo certbot --nginx -d "${DOMAIN}" --non-interactive --agree-tos -m milyutin.mn@gmail.com --redirect || echo "certbot skipped — configure SSL manually"
             fi
